@@ -24,7 +24,7 @@ var game = new Phaser.Game(config);
 var map;
 var player;
 var cursors;
-var groundLayer, coinLayer;
+var groundLayer, coinLayer, treasureLayer;
 var text;
 var score = 0;
 
@@ -37,6 +37,8 @@ function preload() {
     this.load.image('coin', 'assets/coloredJewel.png');
     // hopefully load background image 
     this.load.image('background', 'assets/castleBackground.jpg');
+    // load treasure 
+    this.load.image('treasure', 'assets/treasure.png');
     // player animations
     this.load.atlas('player', 'assets/useKnight.png', 'assets/player.json');
 }
@@ -58,6 +60,13 @@ function create() {
     // the player will collide with this layer
     groundLayer.setCollisionByExclusion([-1]);
 
+    treasureLayer = map.createDynamicLayer('treasure', player, 0, 0);
+
+
+  // goal
+  this.treasure = this.add.sprite(this.sys.game.config.width - 80, this.sys.game.config.height / 2, 'treasure');
+  this.treasure.setScale(0.6);
+
     // // coin image used as tileset
     // var coinTiles = map.addTilesetImage('coin');
     // // add coins as tiles
@@ -69,6 +78,9 @@ function create() {
 
     // create the player sprite    
     player = this.physics.add.sprite(200, 200, 'player');
+
+// tried for hitboxes 
+
     // hitboxes = game.add.group();
     // hitboxes.enableBody = true;
     // player.addChild(hitboxes);
@@ -78,6 +90,7 @@ function create() {
     // hitbox1.damage = 50;
     // hitbox1.knockbackDirection = 0.5;
     // hitbox1.knockbackAmt = 600;}
+    // function enableHitbox(hitboxName)
 
     // for(var i = 0; i < hitboxes.children.length; i++){          // if we find the hitbox with the "name" specified      
     //              if(hitboxes.children[i].name === hitboxName){               // reset it         
@@ -101,6 +114,9 @@ function create() {
     // // will be called    
     // this.physics.add.overlap(player, coinLayer);
 
+
+
+    
     // player walk animation
     this.anims.create({
         key: 'walk',
@@ -120,7 +136,7 @@ function create() {
         frames: this.anims.generateFrameNames('player', {prefix: 'p1_swing', start: 1, end: 5, zeroPad: 1}),
         frameRate: 10,
     });
-
+    
     //jump animation
     this.anims.create({
         key: 'jump',
@@ -128,18 +144,18 @@ function create() {
         frameRate: 10,
         repeat: -1
     });
-
-
+    
+    
     cursors = this.input.keyboard.createCursorKeys();
-
+    
     // set bounds so the camera won't go outside the game world
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     // make the camera follow the player
     this.cameras.main.startFollow(player);
-
+    
     // set background color, so the sky is not black    
     this.cameras.main.setBackgroundColor('#222222');
-
+    
     // this text will show the score
     text = this.add.text(20, 570, '0', {
         fontSize: '30px',
@@ -151,11 +167,13 @@ function create() {
 
 // this function will be called when the player touches a coin
 function collectCoin(sprite, tile) {
+    // treasure collision if{
     coinLayer.removeTileAt(tile.x, tile.y); // remove the tile/coin
     score++; // add 10 points to the score
     text.setText(score); // set the text to show the current score
     return false;
 }
+
 
 function update(time, delta) {
     if (cursors.left.isDown)
@@ -179,7 +197,11 @@ function update(time, delta) {
     if (cursors.up.isDown && player.body.onFloor())
     {
         player.body.setVelocityY(-900);     
-    }
+    };
+    
+    // if (Phaser.Geom.Intersects.RectangleToRectangle(this.player.getBounds(), this.treasure.getBounds())) {
+    //   this.gameOver();}
 
-
+    
+    
 }
