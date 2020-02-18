@@ -11,12 +11,7 @@ var config = {
             debug: false
         }
     },
-    scene: {
-        key: 'main',
-        preload: preload,
-        create: create,
-        update: update
-    }
+    scene: gameScene
 };
 
 var game = new Phaser.Game(config);
@@ -24,11 +19,11 @@ var game = new Phaser.Game(config);
 var map;
 var player;
 var cursors;
-var groundLayer, coinLayer, treasureLayer;
+var groundLayer, coinLayer;
 var text;
 var score = 0;
 
-function preload() {
+gameScene.preload = function() {
     // map made with Tiled in JSON format
     this.load.tilemapTiledJSON('map', 'assets/map2.json');
     // tiles in spritesheet 
@@ -43,7 +38,7 @@ function preload() {
     this.load.atlas('player', 'assets/useKnight.png', 'assets/player.json');
 }
 
-function create() {
+gameScene.create = function() {
     // load the map 
     map = this.make.tilemap({key: 'map'});
 
@@ -64,7 +59,7 @@ function create() {
 
 
   // goal
-  this.treasure = this.add.sprite(this.sys.game.config.width - 80, this.sys.game.config.height / 2, 'treasure');
+  this.treasure = this.add.sprite(this.sys.game.config.width - 80, this.sys.game.config.height / 1.5, 'treasure');
   this.treasure.setScale(0.6);
 
     // // coin image used as tileset
@@ -166,7 +161,7 @@ function create() {
 }
 
 // this function will be called when the player touches a coin
-function collectCoin(sprite, tile) {
+gameScene.collectCoin = function(sprite, tile) {
     // treasure collision if{
     coinLayer.removeTileAt(tile.x, tile.y); // remove the tile/coin
     score++; // add 10 points to the score
@@ -175,7 +170,7 @@ function collectCoin(sprite, tile) {
 }
 
 
-function update(time, delta) {
+gameScene.update = function(time, delta) {
     if (cursors.left.isDown)
     {
         player.body.setVelocityX(-500);
@@ -197,11 +192,29 @@ function update(time, delta) {
     if (cursors.up.isDown && player.body.onFloor())
     {
         player.body.setVelocityY(-900);     
-    };
+    }
     
-    // if (Phaser.Geom.Intersects.RectangleToRectangle(this.player.getBounds(), this.treasure.getBounds())) {
-    //   this.gameOver();}
+    if (Phaser.Geom.Intersects.RectangleToRectangle(this.player.getBounds(), this.treasure.getBounds())) {
+      this.gameOver();
+    }
+    
+};
 
-    
-    
-}
+gameScene.gameOver = function() {
+
+    // flag to set player is dead
+    this.isPlayerAlive = false;
+  
+    // shake the camera
+    this.cameras.main.shake(500);
+  
+    // fade camera
+    this.time.delayedCall(250, function() {
+      this.cameras.main.fade(250);
+    }, [], this);
+  
+    // restart game
+    this.time.delayedCall(500, function() {
+      this.scene.restart();
+    }, [], this);
+  };
