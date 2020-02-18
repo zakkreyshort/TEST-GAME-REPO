@@ -1,4 +1,4 @@
-{ "backgroundcolor":"#000000",
+{ "background":"#222222",
  "height":10,
  "infinite":false,
  "layers":[
@@ -166,7 +166,7 @@
         {
          "columns":1,
          "firstgid":17,
-         "image":"coinGold.png",
+         "image":"jewel.png",
          "imageheight":70,
          "imagewidth":70,
          "margin":0,
